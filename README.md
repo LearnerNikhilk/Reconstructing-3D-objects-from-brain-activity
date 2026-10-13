@@ -1,9 +1,11 @@
 # Reconstructing 3D Objects from Human Brain Activity (fMRI)
 
+# Reconstructing 3D Objects from Human Brain Activity (fMRI)
 
 ---
 
 ### 1. Approach and Pipeline Architecture
+
 Our reconstruction pipeline decodes complete 3D object shapes ($2048$ surface points) directly from whole-brain cortical BOLD signals without subject leakage or unordered vertex collapse:
 
 1. **Hemodynamic Feature Extraction ($W_1 + N_3$):**
@@ -25,6 +27,30 @@ Our reconstruction pipeline decodes complete 3D object shapes ($2048$ surface po
    - **Step E (Small MLP Control):** Evaluated in CV to verify whether non-linear MLP architectures improve over regularized linear models.
 
 ---
+
+### 2. Validation Results & 95% Bootstrap Confidence Intervals
+
+Evaluated on `data/val.npz` (125 scans, 67 held-out objects) using the official `evaluate.py` script. The $95\%$ confidence intervals are computed using $2,000$ cluster bootstrap resamples grouped by object identity:
+
+| Metric | Official Score | 95% Object-Bootstrap CI | Description & Baseline Target |
+| :--- | :---: | :---: | :--- |
+| **Chamfer Distance** | **0.1402** | [0.1267, 0.1545] | Surface error (lower is better; generic baseline: 0.1562) |
+| **F-Score @ 0.05** | **0.498** | [0.447, 0.545] | Precision & recall within 0.05 (generic baseline: 0.395) |
+| **Silhouette IoU** | **0.439** | [0.392, 0.484] | 32-camera silhouette overlap (generic baseline: 0.438) |
+| **Silhouette SSIM** | **0.649** | [0.629, 0.666] | Structural multi-view similarity (generic baseline: 0.692) |
+| **Identification Rate** | **60.05%** | [53.51%, 66.44%] | Retrieval of own object vs other test objects (chance 50.0%) |
+| **Composite Score** | **+0.099** | [-0.022, +0.213] | Official competition score (0 = generic average, 1 = best retrieval) |
+
+#### Cross-Validation Model Progression (5-Fold GroupKFold on Train):
+
+| Model Stage | OOF Chamfer | OOF Identification | CV Runtime |
+| :--- | :---: | :---: | :---: |
+| **Step A (Class-Mean Shape)** | 0.1696 | 58.83% | 74.2s |
+| **Step B (Latent Regression)** | 0.1646 | 58.07% | 72.8s |
+| **Step C (Soft Retrieval)** | 0.1708 | 58.74% | 77.6s |
+| **Step D (Blend & Shrink $\gamma=0.0$)** | 0.1644 | 58.86% | 79.5s |
+| **Step D (Blend & Shrink $\gamma=0.15$)** | **0.1622** | **58.44%** | 79.8s |
+
 
 ### 2. Validation Results & 95% Bootstrap Confidence Intervals
 Evaluated on `data/val.npz` (125 scans, 67 held-out objects) using the official `evaluate.py` script. The $95\%$ confidence intervals are computed using $2,000$ cluster bootstrap resamples grouped by object identity:
