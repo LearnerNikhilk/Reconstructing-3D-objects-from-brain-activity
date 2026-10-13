@@ -1,5 +1,5 @@
 # Reconstructing 3D Objects from Human Brain Activity (fMRI)
-## Technical Take-Home Assignment Report
+
 
 ---
 
