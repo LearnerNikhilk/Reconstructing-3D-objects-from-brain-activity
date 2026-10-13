@@ -1,7 +1,4 @@
 # Reconstructing 3D Objects from Human Brain Activity (fMRI)
-
-# Reconstructing 3D Objects from Human Brain Activity (fMRI)
-
 ---
 
 ### 1. Approach and Pipeline Architecture
